@@ -3,6 +3,9 @@ from tkinter import scrolledtext, PhotoImage
 from datetime import datetime
 import time
 
+# Import the AI response generator from ai.py
+from ai import get_ai_response
+
 class NokiaPhoneGame:
     def __init__(self, root):
         self.root = root
@@ -230,7 +233,7 @@ class NokiaPhoneGame:
             self.screen.see(tk.END)
 
             # Add delay before response appears
-            self.root.after(2000, self.generate_ai_response)
+            self.root.after(2000, lambda: self.generate_ai_response(text))  # Send user response as argument
     
     def send_message_event(self, event):
         self.send_message()
@@ -255,7 +258,7 @@ class NokiaPhoneGame:
             if isinstance(child, tk.Button):
                 child.configure(state=state)
 
-    def generate_ai_response(self):
+    def generate_ai_response(self, user_input):  # User input passed as argument
         # Remove typing indicator before showing response
         self.screen.configure(state='normal')
         
@@ -267,55 +270,15 @@ class NokiaPhoneGame:
             
         self.screen.configure(state='disabled')
         
-        # Generate and show response
-        ai_reply = self.get_ai_response(self.conversation_history)
+        # Generate and show response using ai.py
+        ai_reply = get_ai_response(user_input)  # Call the function from ai.py
         ai_msg = f"Charles: {ai_reply}"
         self.conversation_history.append(ai_msg)
         self.add_message(ai_msg)
         self.waiting_for_response = False
         self.set_input_state(True)
 
-    def get_ai_response(self, conversation):
-        # Extract the last message from Miranda
-        last_user_msg = ""
-        for msg in reversed(conversation):
-            if msg.startswith("Miranda:"):
-                last_user_msg = msg.lower()
-                break
-                
-        # More sophisticated response logic
-        if "who are you" in last_user_msg or "your name" in last_user_msg:
-            return "It's Charles! Don't you remember me?"
-        elif "help" in last_user_msg:
-            return "I really need your help. I found something important."
-        elif "where" in last_user_msg and ("are" in last_user_msg or "you" in last_user_msg):
-            return "I'm at the abandoned warehouse. I followed the suspicious guy here."
-        elif "what" in last_user_msg and "happen" in last_user_msg:
-            return "I was following that person we suspected. They have information about the missing shipment."
-        elif "call" in last_user_msg and ("police" in last_user_msg or "cops" in last_user_msg):
-            return "NO! Don't call the police yet! We need evidence first."
-        elif "dangerous" in last_user_msg:
-            return "Maybe, but we can't back down now. Too much at stake."
-        elif "scared" in last_user_msg or "afraid" in last_user_msg:
-            return "Stay calm. I just need you to look up an address for me."
-        elif "address" in last_user_msg or "location" in last_user_msg:
-            return "I need the address of SafeHaven Storage, Block C. That's where they're keeping it."
-        elif "coming" in last_user_msg:
-            return "NO! Stay where you are. Just be my eyes from the outside."
-        elif "urgent" in last_user_msg:
-            return "Yes, extremely urgent. This could be our only chance to find the truth."
-        elif "password" in last_user_msg or "code" in last_user_msg:
-            return "Try 5891. That was on the paper I found earlier."
-        elif "snake" in last_user_msg:
-            return "Haha, I wish I could play Snake right now to calm my nerves!"
-        else:
-            # Default responses based on message length
-            if len(last_user_msg) < 15:
-                return "Please say more. I need your help figuring this out."
-            else:
-                return "Got it. Stay on the line, I might need more information soon."
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = NokiaPhoneGame(root)
-    root.mainloop()
+# Initialize the app
+root = tk.Tk()
+app = NokiaPhoneGame(root)
+root.mainloop()
