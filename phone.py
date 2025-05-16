@@ -4,7 +4,7 @@ from datetime import datetime
 import time
 
 # Import the AI response generator from ai.py
-from ai import get_ai_response
+from ai import ask_groq as get_ai_response
 
 class NokiaPhoneGame:
     def __init__(self, root):
